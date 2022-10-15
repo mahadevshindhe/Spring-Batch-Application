@@ -2,7 +2,10 @@ package com.shindhe.config;
 
 import com.shindhe.listner.FirstJobListener;
 import com.shindhe.listner.FirstStepListener;
+import com.shindhe.processor.FirstItemProcessor;
+import com.shindhe.reader.FirstItemReader;
 import com.shindhe.service.SecondTasklet;
+import com.shindhe.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -33,6 +36,15 @@ public class SampleJob {
 
     @Autowired
     private FirstStepListener firstStepListener;
+
+    @Autowired
+    private FirstItemReader itemReader;
+
+    @Autowired
+    private FirstItemProcessor itemProcessor;
+
+    @Autowired
+    private FirstItemWriter itemWriter;
 
 //    @Bean
     public Job firstJob() {
@@ -79,4 +91,21 @@ public class SampleJob {
             }
         };
     }*/
+
+    @Bean
+    public Job secondJob() {
+        return jobBuilderFactory.get("Second Job")
+                .incrementer(new RunIdIncrementer())
+                .start(firstChunkStep())
+                .build();
+    }
+
+    private Step firstChunkStep() {
+        return stepBuilderFactory.get("First Chunk Step")
+                .<Integer,Long>chunk(3)
+                .reader(itemReader)
+                .processor(itemProcessor)
+                .writer(itemWriter)
+                .build();
+    }
 }
