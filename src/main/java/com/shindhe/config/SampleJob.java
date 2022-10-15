@@ -34,7 +34,7 @@ public class SampleJob {
     @Autowired
     private FirstStepListener firstStepListener;
 
-    @Bean
+//    @Bean
     public Job firstJob() {
         return jobBuilderFactory.get("First Job")
                 .incrementer(new RunIdIncrementer())
