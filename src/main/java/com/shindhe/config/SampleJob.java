@@ -1,6 +1,7 @@
 package com.shindhe.config;
 
 import com.shindhe.listner.FirstJobListener;
+import com.shindhe.listner.FirstStepListener;
 import com.shindhe.service.SecondTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -30,6 +31,9 @@ public class SampleJob {
     @Autowired
     private FirstJobListener firstJobListener;
 
+    @Autowired
+    private FirstStepListener firstStepListener;
+
     @Bean
     public Job firstJob() {
         return jobBuilderFactory.get("First Job")
@@ -43,6 +47,7 @@ public class SampleJob {
     private Step firstStep() {
         return stepBuilderFactory.get("First Step")
                 .tasklet(firstTask())
+                .listener(firstStepListener)
                 .build();
     }
 
@@ -58,6 +63,7 @@ public class SampleJob {
             @Override
             public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
                 System.out.println("This is first tasklet step");
+                System.out.println("Step Execution Context "+chunkContext.getStepContext().getStepExecutionContext());
                 return RepeatStatus.FINISHED;
             }
         };
