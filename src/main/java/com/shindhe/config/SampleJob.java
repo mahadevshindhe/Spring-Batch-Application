@@ -1,5 +1,6 @@
 package com.shindhe.config;
 
+import com.shindhe.service.SecondTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -21,6 +22,9 @@ public class SampleJob {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
+    @Autowired
+    private SecondTasklet secondTasklet;
+
     @Bean
     public Job firstJob() {
         return jobBuilderFactory.get("First Job")
@@ -37,7 +41,7 @@ public class SampleJob {
 
     private Step secondStep() {
         return stepBuilderFactory.get("Second Step")
-                .tasklet(secondTask())
+                .tasklet(secondTasklet)
                 .build();
     }
 
@@ -52,7 +56,7 @@ public class SampleJob {
         };
     }
 
-    private Tasklet secondTask() {
+   /* private Tasklet secondTask() {
 
         return new Tasklet() {
             @Override
@@ -61,5 +65,5 @@ public class SampleJob {
                 return RepeatStatus.FINISHED;
             }
         };
-    }
+    }*/
 }
