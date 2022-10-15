@@ -1,5 +1,6 @@
 package com.shindhe.config;
 
+import com.shindhe.listner.FirstJobListener;
 import com.shindhe.service.SecondTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -26,12 +27,16 @@ public class SampleJob {
     @Autowired
     private SecondTasklet secondTasklet;
 
+    @Autowired
+    private FirstJobListener firstJobListener;
+
     @Bean
     public Job firstJob() {
         return jobBuilderFactory.get("First Job")
                 .incrementer(new RunIdIncrementer())
                 .start(firstStep())
                 .next(secondStep())
+                .listener(firstJobListener)
                 .build();
     }
 

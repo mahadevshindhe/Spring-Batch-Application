@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ComponentScan({"com.shindhe.config","com.shindhe.service"})
+@ComponentScan({"com.shindhe.config","com.shindhe.service","com.shindhe.listner"})
 public class SpringBatchApplication {
 
 	public static void main(String[] args) {
