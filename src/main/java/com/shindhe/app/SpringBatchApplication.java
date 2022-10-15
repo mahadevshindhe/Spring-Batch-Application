@@ -15,3 +15,8 @@ public class SpringBatchApplication {
 	}
 
 }
+
+
+//run application with different program arguments
+// eg: run=one
+// name=mahadev country=India
