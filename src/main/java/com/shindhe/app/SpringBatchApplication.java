@@ -9,9 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ComponentScan({"com.shindhe.config", "com.shindhe.service", "com.shindhe.listner",
-        "com.shindhe.reader", "com.shindhe.writer", "com.shindhe.processor"
-        , "com.shindhe.controller"})
+@ComponentScan({"com.shindhe.config", "com.shindhe.reader", "com.shindhe.writer", "com.shindhe.processor"})
 @EnableAsync
 @EnableScheduling
 public class SpringBatchApplication {
@@ -21,8 +19,3 @@ public class SpringBatchApplication {
     }
 
 }
-
-
-//run application with different program arguments
-// eg: run=one
-// name=mahadev country=India
