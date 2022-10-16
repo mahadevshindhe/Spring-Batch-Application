@@ -46,7 +46,7 @@ public class SampleJob {
     @Autowired
     private FirstItemWriter itemWriter;
 
-//    @Bean
+    @Bean
     public Job firstJob() {
         return jobBuilderFactory.get("First Job")
                 .incrementer(new RunIdIncrementer())
