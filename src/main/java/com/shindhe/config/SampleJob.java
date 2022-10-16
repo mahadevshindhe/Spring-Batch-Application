@@ -97,14 +97,15 @@ public class SampleJob {
         return jobBuilderFactory.get("Second Job")
                 .incrementer(new RunIdIncrementer())
                 .start(firstChunkStep())
+                .next(secondStep())
                 .build();
     }
 
     private Step firstChunkStep() {
         return stepBuilderFactory.get("First Chunk Step")
-                .<Integer,Integer>chunk(3)
+                .<Integer,Long>chunk(3)
                 .reader(itemReader)
-//                .processor(itemProcessor)
+                .processor(itemProcessor)
                 .writer(itemWriter)
                 .build();
     }
