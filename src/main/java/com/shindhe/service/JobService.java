@@ -1,5 +1,6 @@
 package com.shindhe.service;
 
+import com.shindhe.request.JobParamsRequest;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -11,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -28,9 +30,13 @@ public class JobService {
     Job secondJob;
 
     @Async
-    public void startJob(String jobName) {
+    public void startJob(String jobName, List<JobParamsRequest> jobParamsRequestList) {
         Map<String, JobParameter> params = new HashMap<>();
         params.put("currentTime", new JobParameter(System.currentTimeMillis()));
+
+        jobParamsRequestList.stream().forEach(jobParamRequest -> {
+            params.put(jobParamRequest.getParamKey(), new JobParameter(jobParamRequest.getParamValue()));
+        });
 
         JobParameters jobParameters = new JobParameters(params);
         try {
