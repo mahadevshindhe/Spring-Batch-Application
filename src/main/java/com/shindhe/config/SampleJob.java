@@ -8,12 +8,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -49,21 +51,22 @@ public class SampleJob {
     private Step firstChunkStep() {
         return stepBuilderFactory.get("First Chunk Step")
                 .<StudentCsv, StudentCsv>chunk(3)
-                .reader(flatFileItemReader())
+                .reader(flatFileItemReader(null))
 //                .processor(itemProcessor)
                 .writer(itemWriter)
                 .build();
     }
 
-    public FlatFileItemReader<StudentCsv> flatFileItemReader() {
+    @StepScope
+    @Bean
+    public FlatFileItemReader<StudentCsv> flatFileItemReader(@Value("#{jobParameters['inputFile']}") FileSystemResource fileSystemResource ) {
         FlatFileItemReader<StudentCsv> flatFileItemReader = new FlatFileItemReader<>();
-        flatFileItemReader.setResource(new FileSystemResource(new File("C:\\Users\\WA661DW\\Downloads\\Spring-Batch-Application\\InputFiles\\students_pipe_delimitter.csv")));
+        flatFileItemReader.setResource(fileSystemResource);
         flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>() {
             {
-                setLineTokenizer(new DelimitedLineTokenizer("|") {
+                setLineTokenizer(new DelimitedLineTokenizer() {
                     {
                         setNames("ID", "First Name", "Last Name", "Email");
-//                        setDelimiter("|");
                     }
                 });
 
