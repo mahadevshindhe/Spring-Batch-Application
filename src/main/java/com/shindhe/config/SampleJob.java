@@ -57,12 +57,13 @@ public class SampleJob {
 
     public FlatFileItemReader<StudentCsv> flatFileItemReader() {
         FlatFileItemReader<StudentCsv> flatFileItemReader = new FlatFileItemReader<>();
-        flatFileItemReader.setResource(new FileSystemResource(new File("C:\\Users\\WA661DW\\Downloads\\Spring-Batch-Application\\InputFiles\\students.csv")));
+        flatFileItemReader.setResource(new FileSystemResource(new File("C:\\Users\\WA661DW\\Downloads\\Spring-Batch-Application\\InputFiles\\students_pipe_delimitter.csv")));
         flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>() {
             {
-                setLineTokenizer(new DelimitedLineTokenizer() {
+                setLineTokenizer(new DelimitedLineTokenizer("|") {
                     {
                         setNames("ID", "First Name", "Last Name", "Email");
+//                        setDelimiter("|");
                     }
                 });
 
