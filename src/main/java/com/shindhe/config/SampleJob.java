@@ -23,8 +23,11 @@ import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -50,10 +53,18 @@ public class SampleJob {
     @Autowired
     private FirstItemWriter itemWriter;
 
-    @Autowired
-    private DataSource datasource;
+    @Bean
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource datasource(){
+        return DataSourceBuilder.create().build();
+    };
 
-
+    @Bean
+    @ConfigurationProperties(prefix = "spring.universitydatasource")
+    public DataSource universityDatasource(){
+        return DataSourceBuilder.create().build();
+    };
 
     @Bean
     public Job chunkJob() {
@@ -143,7 +154,7 @@ public class SampleJob {
         JdbcCursorItemReader<StudentJdbc> jdbcCursorItemReader =
                 new JdbcCursorItemReader<StudentJdbc>();
 
-        jdbcCursorItemReader.setDataSource(datasource);
+        jdbcCursorItemReader.setDataSource(universityDatasource());
         jdbcCursorItemReader.setSql(
                 "select id, first_name as firstName, last_name as lastName,"
                         + "email from student");
