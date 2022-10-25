@@ -12,6 +12,8 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -90,15 +92,17 @@ public class SampleJob {
 
     private Step firstChunkStep() {
         return stepBuilderFactory.get("First Chunk Step")
-                .<StudentJdbc, StudentJdbc>chunk(3)
-//                .reader(flatFileItemReader(null))
+                .<StudentCsv, StudentCsv>chunk(3)
+                .reader(flatFileItemReader(null))
 //                .reader(flatFileItemReader(null))
 //                .reader(staxEventItemReader(null))
-                .reader(jdbcCursorItemReader())
+//                .reader(jdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
 //                .processor(itemProcessor)
 //                .writer(jsonFileItemWriter(null))
-                .writer(staxEventItemWriter(null))
+//                .writer(staxEventItemWriter(null))
+                . writer(jdbcBatchItemWriter())
+
                 .build();
     }
 
@@ -145,12 +149,61 @@ public class SampleJob {
 
     @StepScope
     @Bean
+    public FlatFileItemReader<StudentCsv> flatFileItemReader(
+            @Value("#{jobParameters['inputFile']}") FileSystemResource fileSystemResource) {
+        FlatFileItemReader<StudentCsv> flatFileItemReader =
+                new FlatFileItemReader<StudentCsv>();
+
+        flatFileItemReader.setResource(fileSystemResource);
+
+        flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>() {
+            {
+                setLineTokenizer(new DelimitedLineTokenizer() {
+                    {
+                        setNames("ID", "First Name", "Last Name", "Email");
+                    }
+                });
+
+                setFieldSetMapper(new BeanWrapperFieldSetMapper<StudentCsv>() {
+                    {
+                        setTargetType(StudentCsv.class);
+                    }
+                });
+
+            }
+        });
+
+		/*
+		DefaultLineMapper<StudentCsv> defaultLineMapper =
+				new DefaultLineMapper<StudentCsv>();
+
+		DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
+		delimitedLineTokenizer.setNames("ID", "First Name", "Last Name", "Email");
+
+		defaultLineMapper.setLineTokenizer(delimitedLineTokenizer);
+
+		BeanWrapperFieldSetMapper<StudentCsv> fieldSetMapper =
+				new BeanWrapperFieldSetMapper<StudentCsv>();
+		fieldSetMapper.setTargetType(StudentCsv.class);
+
+		defaultLineMapper.setFieldSetMapper(fieldSetMapper);
+
+		flatFileItemReader.setLineMapper(defaultLineMapper);
+		*/
+
+        flatFileItemReader.setLinesToSkip(1);
+
+        return flatFileItemReader;
+    }
+
+/*    @StepScope
+    @Bean
     public JsonItemReader<StudentJson> flatFileItemReader(@Value("#{jobParameters['inputFile']}") FileSystemResource fileSystemResource ) {
         JsonItemReader<StudentJson> jsonItemReader = new JsonItemReader<StudentJson>();
         jsonItemReader.setResource(fileSystemResource);
         jsonItemReader.setJsonObjectReader(new JacksonJsonObjectReader(StudentJson.class));
         return jsonItemReader;
-    }
+    }*/
 
     @StepScope
     @Bean
@@ -261,6 +314,22 @@ public class SampleJob {
         });
 
         return staxEventItemWriter;
+    }
+
+    @Bean
+    public JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter() {
+        JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter =
+                new JdbcBatchItemWriter<StudentCsv>();
+
+        jdbcBatchItemWriter.setDataSource(universityDatasource());
+        jdbcBatchItemWriter.setSql(
+                "insert into student(id, first_name, last_name, email) "
+                        + "values (:id, :firstName, :lastName, :email)");
+
+        jdbcBatchItemWriter.setItemSqlParameterSourceProvider(
+                new BeanPropertyItemSqlParameterSourceProvider<StudentCsv>());
+
+        return jdbcBatchItemWriter;
     }
 }
 
