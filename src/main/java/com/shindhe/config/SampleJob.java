@@ -1,11 +1,9 @@
 package com.shindhe.config;
 
-import com.shindhe.model.StudentCsv;
-import com.shindhe.model.StudentJdbc;
-import com.shindhe.model.StudentJson;
-import com.shindhe.model.StudentXml;
+import com.shindhe.model.*;
 import com.shindhe.processor.FirstItemProcessor;
 import com.shindhe.reader.FirstItemReader;
+import com.shindhe.service.StudentService;
 import com.shindhe.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -13,6 +11,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -53,6 +52,10 @@ public class SampleJob {
     @Autowired
     private FirstItemWriter itemWriter;
 
+    @Autowired
+    private StudentService studentService;
+
+
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource")
@@ -76,11 +79,12 @@ public class SampleJob {
 
     private Step firstChunkStep() {
         return stepBuilderFactory.get("First Chunk Step")
-                .<StudentJdbc, StudentJdbc>chunk(3)
+                .<StudentResponse, StudentResponse>chunk(3)
 //                .reader(flatFileItemReader(null))
 //                .reader(flatFileItemReader(null))
 //                .reader(staxEventItemReader(null))
-                .reader(jdbcCursorItemReader())
+//                .reader(jdbcCursorItemReader())
+                .reader(itemReaderAdapter())
 //                .processor(itemProcessor)
                 .writer(itemWriter)
                 .build();
@@ -167,6 +171,17 @@ public class SampleJob {
 //        jdbcCursorItemReader.setCurrentItemCount(5); //start reading from 6th record
 //        jdbcCursorItemReader.setMaxItemCount(10);
         return jdbcCursorItemReader;
+    }
+
+    public ItemReaderAdapter<StudentResponse> itemReaderAdapter() {
+        ItemReaderAdapter<StudentResponse> itemReaderAdapter =
+                new ItemReaderAdapter<StudentResponse>();
+
+        itemReaderAdapter.setTargetObject(studentService);
+        itemReaderAdapter.setTargetMethod("getStudent");
+        itemReaderAdapter.setArguments(new Object[] {1L, "Test"});
+
+        return itemReaderAdapter;
     }
 }
 

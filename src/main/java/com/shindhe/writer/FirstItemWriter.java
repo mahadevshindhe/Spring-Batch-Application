@@ -1,18 +1,15 @@
 package com.shindhe.writer;
 
-import com.shindhe.model.StudentCsv;
-import com.shindhe.model.StudentJdbc;
-import com.shindhe.model.StudentJson;
-import com.shindhe.model.StudentXml;
+import com.shindhe.model.*;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class FirstItemWriter implements ItemWriter<StudentJdbc> {
+public class FirstItemWriter implements ItemWriter<StudentResponse> {
     @Override
-    public void write(List<? extends StudentJdbc> list) throws Exception {
+    public void write(List<? extends StudentResponse> list) throws Exception {
         System.out.println("Inside Item Writer");
         list.stream().forEach(System.out::println);
     }
