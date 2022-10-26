@@ -12,8 +12,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.item.file.*;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -29,6 +28,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Configuration
 public class SampleJob {
@@ -116,13 +116,24 @@ public class SampleJob {
         return flatFileItemReader;
     }
 
+
     @StepScope
     @Bean
     public JsonFileItemWriter<StudentJson> jsonFileItemWriter(
             @Value("#{jobParameters['outputFile']}") FileSystemResource fileSystemResource) {
         JsonFileItemWriter<StudentJson> jsonFileItemWriter =
-                new JsonFileItemWriter<>(fileSystemResource,
-                        new JacksonJsonObjectMarshaller<StudentJson>());
+                new JsonFileItemWriter<StudentJson>(fileSystemResource,
+                        new JacksonJsonObjectMarshaller<StudentJson>()) {
+                    @Override
+                    public String doWrite(List<? extends StudentJson> items) {
+                        items.stream().forEach(item -> {
+                            if (item.getId() == 108) {
+                                throw new NullPointerException();
+                            }
+                        });
+                        return super.doWrite(items);
+                    }
+                };
 
         return jsonFileItemWriter;
     }
