@@ -10,7 +10,9 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -71,6 +73,12 @@ public class SampleJob {
                 .reader(flatFileItemReader(null))
                 .processor(itemProcessor)
                 .writer(jsonFileItemWriter(null))
+                .faultTolerant()
+                .skip(Throwable.class)
+//                .skip(FlatFileParseException.class)
+//                .skip(NullPointerException.class)
+//                .skipLimit(Integer.MAX_VALUE)
+                .skipPolicy(new AlwaysSkipItemSkipPolicy())
                 .build();
     }
 
