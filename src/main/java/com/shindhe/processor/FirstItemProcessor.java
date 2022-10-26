@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 public class FirstItemProcessor implements ItemProcessor<StudentCsv, StudentJson> {
     @Override
     public StudentJson process(StudentCsv item) throws Exception {
-        System.out.println("Inside Item Processor");
 
         if(item.getId() == 101) {
+            System.out.println("Inside Item Processor");
             throw new NullPointerException();
         }
 
