@@ -1,14 +1,14 @@
 package com.shindhe.processor;
 
-import com.shindhe.model.StudentJdbc;
+import com.shindhe.model.StudentCsv;
 import com.shindhe.model.StudentJson;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FirstItemProcessor implements ItemProcessor<StudentJdbc, StudentJson> {
+public class FirstItemProcessor implements ItemProcessor<StudentCsv, StudentJson> {
     @Override
-    public StudentJson process(StudentJdbc item) throws Exception {
+    public StudentJson process(StudentCsv item) throws Exception {
         System.out.println("Inside Item Processor");
         StudentJson studentJson = new StudentJson();
         studentJson.setId(item.getId());

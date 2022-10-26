@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ComponentScan({"com.shindhe.config", "com.shindhe.reader", "com.shindhe.writer", "com.shindhe.processor","com.shindhe.service"})
+@ComponentScan({"com.shindhe.config", "com.shindhe.reader", "com.shindhe.processor"})
 @EnableAsync
 @EnableScheduling
 public class SpringBatchApplication {
