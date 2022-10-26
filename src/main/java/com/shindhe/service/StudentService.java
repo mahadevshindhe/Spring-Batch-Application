@@ -3,15 +3,16 @@ package com.shindhe.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shindhe.model.StudentCsv;
 import org.springframework.stereotype.Service;
-//import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import com.shindhe.model.StudentResponse;
 
 @Service
 public class StudentService {
 	
-	/*List<StudentResponse> list;
+	List<StudentResponse> list;
 
 	public List<StudentResponse> restCallToGetStudents() {
 		RestTemplate restTemplate = new RestTemplate();
@@ -38,5 +39,13 @@ public class StudentService {
 			return list.remove(0);
 		}
 		return null;
-	}*/
+	}
+
+    public StudentResponse restCallToCreateStudent(StudentCsv studentCsv) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        return restTemplate.postForObject("http://localhost:8081/api/v1/createStudent",
+                studentCsv,
+                StudentResponse.class);
+    }
 }

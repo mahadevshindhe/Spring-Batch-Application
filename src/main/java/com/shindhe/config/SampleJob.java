@@ -12,6 +12,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -105,8 +106,8 @@ public class SampleJob {
 //                .writer(jsonFileItemWriter(null))
 //                .writer(staxEventItemWriter(null))
 //                . writer(jdbcBatchItemWriter())
-                .writer(jdbcBatchItemWriter1())
-
+//                .writer(jdbcBatchItemWriter1())
+                .writer(itemWriterAdapter())
                 .build();
     }
 
@@ -359,6 +360,16 @@ public class SampleJob {
                 });
 
         return jdbcBatchItemWriter;
+    }
+
+    public ItemWriterAdapter<StudentCsv> itemWriterAdapter() {
+        ItemWriterAdapter<StudentCsv> itemWriterAdapter =
+                new ItemWriterAdapter<StudentCsv>();
+
+        itemWriterAdapter.setTargetObject(studentService);
+        itemWriterAdapter.setTargetMethod("restCallToCreateStudent");
+
+        return itemWriterAdapter;
     }
 
 }
