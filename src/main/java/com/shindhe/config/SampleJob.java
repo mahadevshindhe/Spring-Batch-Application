@@ -1,6 +1,7 @@
 package com.shindhe.config;
 
 import com.shindhe.listener.SkipListener;
+import com.shindhe.listener.SkipListenerImpl;
 import com.shindhe.model.StudentCsv;
 import com.shindhe.model.StudentJson;
 import com.shindhe.processor.FirstItemProcessor;
@@ -48,6 +49,9 @@ public class SampleJob {
     @Autowired
     private SkipListener skipListener;
 
+    @Autowired
+    private SkipListenerImpl skipListenerImpl;
+
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource")
@@ -83,7 +87,8 @@ public class SampleJob {
 //                .skip(NullPointerException.class)
 //                .skipLimit(Integer.MAX_VALUE)
                 .skipPolicy(new AlwaysSkipItemSkipPolicy())
-                .listener(skipListener)
+//                .listener(skipListener)
+                .listener(skipListenerImpl)
                 .build();
     }
 
